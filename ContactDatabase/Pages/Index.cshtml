@@ -1,0 +1,108 @@
+﻿@page "/"
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+<script src="https://unpkg.com/htmx.org@1.9.3" integrity="sha384-lVb3Rd/Ca0AxaoZg5sACe8FJKF0tnUgR2Kd7ehUOG5GCcROv5uBIZsOqovBAcWua" crossorigin="anonymous"></script>
+@Html.AntiForgeryToken()
+<div class="card" style="margin:19px;">
+    <h2 style="text-align:center; padding:12px;">Contact List</h2>
+</div>
+<p style="padding-left:17px; font-weight:600"> you can search for a contact by entering first name , last name or email</p>
+<div class="mb-3" style="margin-left:20px;  " >
+        <div class="row">
+            <div class="col-3" >
+            <form>
+                <input type="text" id="searchby" onkeyup="getData()"  style="width:400px;" placeholder=" search by first name , last name or email ..." />
+            </form>
+            </div>
+        </div>
+</div>
+
+<div style="padding:20px;">
+    <table class="table table-bordered table-striped">
+        <thead style="background-color: cornflowerblue;">
+            <tr>
+                <th>
+                    First name
+                </th>
+                <th>
+                    Last name
+                </th>
+                <th>
+                    Email
+                </th>
+                <th>
+                    Title
+                </th>
+                <th>
+                    Description
+                </th>
+                <th>
+                    Date of birth
+                </th>
+                <th>
+                    Marriage status
+                </th>
+            </tr>
+        </thead>
+        <tbody id="myTable">
+            @foreach(var item in Model.ContactList)
+            {
+                <tr>
+                    <th>@item.FirstName</th>
+                    <th>@item.LastName</th>
+                    <th>@item.Email</th>
+                    <th>@item.Title</th>
+                    <th>@item.Description</th>
+                    <th>@item.BirthDate</th>
+                    <th>@(item.MarriageStatus ? "Yes" : "NO")</th>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section scripts
+{
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        async function antiforgeryToken() {
+            var response = await fetch("/antiforgerytoken", {
+                method: "GET",
+                credentials: 'include'
+            });
+            if (response.ok) {
+                const xsrfToken = document.cookie
+                    .split("; ")
+                    .find(row => row.startsWith("XSRF-TOKEN="))
+                    .split("=")[1];
+                return xsrfToken;
+            }
+            else {
+                return null;
+            }
+        }
+        async function getData ()
+        {
+                var searchbar = document.getElementById("searchby");
+                var searchItem = searchbar.value;
+                var tableContent = document.getElementById("myTable");
+                var token = await antiforgeryToken();
+                fetch(`/?handler=Search&searchValue=${encodeURIComponent(searchItem)}`, {
+                    headers: {
+                        "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val(),
+                        "X-XSRF-TOKEN": token
+                    },
+                }).then(response => response.json())
+                    .then(data => {
+                        console.log(data.list);
+                        var html = "";
+                        for (const obj of data.list) {
+                           html += "<tr><th>" + obj.firstName + "</th><th>" + obj.lastName + "</th><th>" + obj.email + "</th><th>" + obj.title + "</th><th>" +obj.description + "</th><th>" + obj.birthDate + "</th><th>" + (obj.marriageStatus ? "Yes" : "NO") + "</th></tr>";
+                        }
+                tableContent.innerHTML = html;
+            }).catch(error => console.error(error));
+        }
+    </script>
+}

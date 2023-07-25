@@ -1,0 +1,58 @@
+﻿@page
+@model ContactDatabase.Pages.ContactsModel
+@{
+}
+<div class="row" >
+    <div class="col-lg-9 mx-auto rounded border p-3">
+        <h2 style="padding:15px;">New Contact</h2>
+        <form method="post">
+            <div class="firstname" style="margin:10px;">
+                <label class="myfirstname" style="padding:10px;">First Name</label>
+                <input type="text" name="Contact.FirstName" style="margin-left:44px;" required />
+            </div>
+
+            <div class="lastname" style="margin:10px;">
+                <label class="mylastname" style="padding:10px;">Last Name</label>
+                <input type="text" name="Contact.LastName" style="margin-left:44px;"  required />
+            </div>
+
+            <div class="email" style="margin:10px;">
+                <label class="myemail" style="padding:10px;">Email</label>
+                <input type="email" style="margin-left:82px;" name="Contact.Email" required />
+            </div>
+
+            <div class="title" style="margin:10px;">
+                <label class="mytitle" style="padding:10px;">Title</label>
+                <select id="title" style="margin-left:90px; width:192px;" name="Contact.Title">
+                    <option value="Mr">Mr</option>
+                    <option value="Miss" selected>Miss</option>
+                    <option value="Mrs">Mrs</option>
+                </select>
+            </div>
+
+            <div class="description" style="margin:10px;">
+                <label class="mydescription" style="display:inline-block; text-align: right; padding-left:10px;">Description</label>
+                <textarea id="description" placeholder="Enter your description here ...." style="margin-left:51px;  display: inline-block;
+                  vertical-align: top;" rows="5" cols="50" name="Contact.Description"></textarea>
+            </div>
+
+            <div class="dateofbirth" style="margin:15px;">
+                <label class="mydateofbirth" style="padding-left:9px;">Date of Birth</label>
+                <input type="date" style="margin-left:46px;" name="Contact.BirthDate" required />
+            </div>
+
+            <div class="marriage" style="margin:10px;">
+                <label class="mystatus" style="padding:9px;">Marriage Status</label>
+                <select id="marriage" style="margin-left:17px; width:192px;" name="Contact.MarriageStatus">
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                </select>
+            </div>
+
+            <div class="btn">
+                <button type="submit" class="btn btn-primary">Add Contact</button>
+            </div>
+        </form>
+
+    </div>
+</div>
