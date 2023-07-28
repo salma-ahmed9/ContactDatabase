@@ -23,7 +23,7 @@ public class ContactListModel : PageModel
 
     public async Task<IActionResult> OnGetSearch(string searchValue)
     {
-        var output = await _edgeclient.QueryAsync<Contact>("SELECT Contact {first_name,last_name,email,title,birth_date,description,marriage_status};");
+        var output = await _edgeclient.QueryAsync<Contact>("SELECT Contact {first_name,last_name,email,title,birth_date,description,marriage_status}  Order by .first_name;");
         ContactList = output.ToList();
 
         if (string.IsNullOrEmpty(searchValue))
@@ -41,5 +41,15 @@ public class ContactListModel : PageModel
         }
         var result = new { list = NewContactList };
         return new JsonResult(result);
+    }
+
+    public async Task<IActionResult> OnGetDelete(string contactId)
+    {
+        Console.WriteLine(contactId);
+        Guid newId = new Guid(contactId);
+        var output = await _edgeclient.QueryAsync<Contact>("DELETE Contact FILTER .id = <uuid>$id", new Dictionary<string, object?> { { "id", newId } });
+        var result = await _edgeclient.QueryAsync<Contact>("SELECT Contact {*} Order by .first_name;");
+        ContactList = result.ToList();
+        return new JsonResult(new { list = ContactList });
     }
 }

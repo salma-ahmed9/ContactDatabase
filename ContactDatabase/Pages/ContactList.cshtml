@@ -63,7 +63,10 @@
                     @if(User.IsInRole("Admin"))
                     {
                         <th>
-                            <a asp-page="EditContact" asp-route-id="@item.Id" class="btn">Edit</a>
+                            <div style="display: flex;">
+                                <a asp-page="EditContact" asp-route-id="@item.Id" class="btn">Edit</a>
+                                <a class="btn btn-red" onclick="deleteContact('@item.Id')">Delete</a>
+                            </div>
                         </th>
                     }
                 </tr>
@@ -73,6 +76,13 @@
                     text-decoration:none;
                     background-color:deeppink;
                     color:white;
+                    margin-right:10px;
+                }
+
+                .btn-red{
+                    text-decoration: none;
+                    background-color: darkred;
+                    color: white;
                 }
             </style>
         </tbody>
@@ -103,7 +113,6 @@
             var searchbar = document.getElementById("searchby");
             var searchItem = searchbar.value;
             var tableContent = document.getElementById("myTable");
-            var editButton = document.getElementById("edit");
             var token = await antiforgeryToken();
             fetch(`/ContactList?handler=Search&searchValue=${encodeURIComponent(searchItem)}`, {
                 headers: {
@@ -113,12 +122,32 @@
             }).then(response => response.json())
                 .then(data => {
                     var html = "";
-                    html += "<style>.btn { background-color: deeppink; color: white; text-decoration: none;}</style>";
+                    html += "<style>.btn { background-color: deeppink; color: white; text-decoration: none; margin-right:10px;} .btn-red{background-color: darkred; color: white; text-decoration: none;} .delete{display:flex;}</style>";
                     for (const obj of data.list) {
-                        html += "<tr><th>" + obj.firstName + "</th><th>" + obj.lastName + "</th><th>" + obj.email + "</th><th>" + obj.title + "</th><th>" + obj.description + "</th><th>" + obj.birthDate + "</th><th>" + (obj.marriageStatus ? "Yes" : "NO") + "</th> <th><a href='/EditContact?id=" + obj.id + "' class='btn'>Edit</a></th> </tr>";
+                        html += "<tr><th>" + obj.firstName + "</th><th>" + obj.lastName + "</th><th>" + obj.email + "</th><th>" + obj.title + "</th><th>" + obj.description + "</th><th>" + obj.birthDate + "</th><th>" + (obj.marriageStatus ? "Yes" : "NO") + "</th><th> <div class='delete'><a href='/EditContact?id=" + obj.id + "' class='btn'>Edit</a> <a class='btn btn-red' onclick='deleteContact(\"" + obj.id + "\")'>Delete</a> </div> </th> </tr>";
                     }
                     tableContent.innerHTML = html;
                     
+                }).catch(error => console.error(error));
+        }
+
+        async function deleteContact(id) {
+            var tableContent = document.getElementById("myTable");
+            var token = await antiforgeryToken();
+            fetch(`/ContactList?handler=Delete&contactId=${encodeURIComponent(id)}`, {
+                headers: {
+                    "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val(),
+                    "X-XSRF-TOKEN": token
+                },
+            }).then(response => response.json())
+                .then(data => {
+                    var html = "";
+                    html += "<style>.btn { background-color: deeppink; color: white; text-decoration: none; margin-right:10px;} .btn-red{background-color: darkred; color: white; text-decoration: none;} .delete{display:flex;}</style>";
+                    for (const obj of data.list) {
+                        html += "<tr><th>" + obj.firstName + "</th><th>" + obj.lastName + "</th><th>" + obj.email + "</th><th>" + obj.title + "</th><th>" + obj.description + "</th><th>" + obj.birthDate + "</th><th>" + (obj.marriageStatus ? "Yes" : "NO") + "</th><th> <div class='delete'><a href='/EditContact?id=" + obj.id + "' class='btn'>Edit</a> <a class='btn btn-red' onclick='deleteContact(\"" + obj.id + "\")'>Delete</a> </div> </th> </tr>";
+                    }
+                    tableContent.innerHTML = html;
+
                 }).catch(error => console.error(error));
         }
             
