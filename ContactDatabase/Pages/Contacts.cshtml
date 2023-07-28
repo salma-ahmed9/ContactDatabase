@@ -1,4 +1,4 @@
-﻿@page
+﻿@page "/Contacts"
 @model ContactDatabase.Pages.ContactsModel
 @{
 }
@@ -37,8 +37,8 @@
             </div>
 
             <div class="dateofbirth" style="margin:15px;">
-                <label class="mydateofbirth" style="padding-left:9px;">Date of Birth</label>
-                <input type="date" style="margin-left:46px;" name="Contact.BirthDate" required />
+                <label class="mydateofbirth" style="padding-left:3px;">Date of Birth</label>
+                <input type="date" style="margin-left:44px;" name="Contact.BirthDate" required />
             </div>
 
             <div class="marriage" style="margin:10px;">
@@ -46,6 +46,24 @@
                 <select id="marriage" style="margin-left:17px; width:192px;" name="Contact.MarriageStatus">
                     <option value="true">Yes</option>
                     <option value="false">No</option>
+                </select>
+            </div>
+
+            <div class="username" style="margin:10px;">
+                <label class="myusername" style="padding:10px;">Username</label>
+                <input type="text" name="Contact.Username" style="margin-left:55px;" required />
+            </div>
+
+            <div class="password" style="margin:10px;">
+                <label class="mypassword" style="padding:10px;">Password</label>
+                <input type="password" name="Contact.Password" style="margin-left:58px;" required />
+            </div>
+
+            <div class="role" style="margin:10px;">
+                <label class="myrole" style="padding:9px;">Specify Role</label>
+                <select id="role" style="margin-left:40px; width:192px;" name="Contact.Role">
+                    <option value="Admin">Admin</option>
+                    <option value="User">User</option>
                 </select>
             </div>
 

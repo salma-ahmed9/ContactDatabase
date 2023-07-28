@@ -1,0 +1,99 @@
+﻿@page "/EditContact"
+@model ContactDatabase.Pages.EditContactModel
+@{
+}
+<div class="row">
+    <div class="col-lg-9 mx-auto rounded border p-3">
+        <h2 style="padding:15px;">Edit Contact</h2>
+        <form method="post" asp-page-handler="EditContact">
+            <input type="hidden" name="id" value="@Model.EditingContact.Id" />
+            <div class="firstname" style="margin:10px;">
+                <label class="myfirstname" style="padding:10px;">First Name </label>
+                <input type="text" name="EditingContact.FirstName" value="@Model.EditingContact.FirstName" style="margin-left:44px;" required />
+            </div>
+
+            <div class="lastname" style="margin:10px;">
+                <label class="mylastname" style="padding:10px;">Last Name</label>
+                <input type="text" name="EditingContact.LastName" value="@Model.EditingContact.LastName" style="margin-left:44px;" required />
+            </div>
+
+            <div class="email" style="margin:10px;">
+                <label class="myemail" style="padding:10px;">Email</label>
+                <input type="email" style="margin-left:82px;" name="EditingContact.Email" value="@Model.EditingContact.Email" required />
+            </div>
+
+            <div class="title" style="margin:10px;">
+                <label class="mytitle" style="padding:10px;">Title</label>
+                <select id="title" style="margin-left:90px; width:192px;" name="EditingContact.Title">
+                    @if (Model.EditingContact.Title=="Mr")
+                    {
+                        <option value="Mr" selected>Mr</option>
+                        <option value="Miss">Miss</option>
+                        <option value="Mrs">Mrs</option>
+                    }
+                    else if (Model.EditingContact.Title == "Miss")
+                    {
+                        <option value="Mr">Mr</option>
+                        <option value="Miss" selected>Miss</option>
+                        <option value="Mrs">Mrs</option>
+                    }
+                    else
+                    {
+                        <option value="Mr">Mr</option>
+                        <option value="Miss">Miss</option>
+                        <option value="Mrs" selected>Mrs</option>
+                    }
+                </select>
+            </div>
+
+            <div class="description" style="margin:10px;">
+                <label class="mydescription" style="display:inline-block; text-align: right; padding-left:10px;">Description</label>
+                <textarea id="description"  style="margin-left:51px;  display: inline-block;
+                  vertical-align: top;" rows="5" cols="50" name="EditingContact.Description">@Model.EditingContact.Description </textarea>
+            </div>
+
+            <div class="dateofbirth" style="margin:15px;">
+                <label class="mydateofbirth" style="padding-left:3px;">Date of Birth</label>
+                <input type="date" style="margin-left:44px;" name="EditingContact.BirthDate" value="@Model.EditingContact.BirthDate" required />
+            </div>
+
+            <div class="marriage" style="margin:10px;">
+                <label class="mystatus" style="padding:9px;">Marriage Status</label>
+                <select id="marriage" style="margin-left:17px; width:192px;" name="EditingContact.MarriageStatus">
+                    @if(Model.EditingContact.MarriageStatus)
+                    {
+                        <option value="true" selected>Yes</option>
+                        <option value="false">No</option>
+                    }
+                    else
+                    {
+                        <option value="true">Yes</option>
+                        <option value="false" selected>No</option>
+                    }
+                </select>
+            </div>
+
+            <div class="username" style="margin:10px;">
+                <label class="myusername" style="padding:10px;">Username</label>
+                <input type="text" name="EditingContact.Username" style="margin-left:55px;" value="@Model.EditingContact.Username" required />
+            </div>
+
+            <div class="password" style="margin:10px;">
+                <label class="mypassword" style="padding:10px;">Password</label>
+                <input type="password" name="EditingContact.Password" style="margin-left:58px;" required />
+            </div>
+
+            <div class="role" style="margin:10px;">
+                <label class="myrole" style="padding:9px;">Specify Role</label>
+                <select id="role" style="margin-left:40px; width:192px;" name="EditingContact.Role" value="@Model.EditingContact.Role">
+                    <option value="Admin">Admin</option>
+                    <option value="User">User</option>
+                </select>
+            </div>
+
+            <div class="btn">
+                <button type="submit" class="btn btn-primary">Edit Contact</button>
+            </div>
+        </form>
+    </div>
+</div>

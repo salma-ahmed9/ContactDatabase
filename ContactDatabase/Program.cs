@@ -1,14 +1,17 @@
 using EdgeDB;
 using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddAntiforgery();
+builder.Services.AddHttpClient();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
 builder.Services.AddEdgeDB(EdgeDBConnection.FromInstanceName("contactdb"), config =>
 {
     config.SchemaNamingStrategy = INamingStrategy.SnakeCaseNamingStrategy;
 });
-
 var app = builder.Build();
 
 app.MapGet("/antiforgerytoken", (IAntiforgery antiforgery, HttpContext context) =>
@@ -17,9 +20,6 @@ app.MapGet("/antiforgerytoken", (IAntiforgery antiforgery, HttpContext context) 
     context.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken!, new CookieOptions { HttpOnly = false });
     return Results.Ok();
 });
-
-
-
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

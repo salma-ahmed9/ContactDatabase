@@ -1,49 +1,85 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Security.Claims;
 using EdgeDB;
-
+using Microsoft.AspNetCore.Identity;
 
 namespace ContactDatabase.Pages;
-[BindProperties]
 public class IndexModel : PageModel
 {
     private readonly EdgeDBClient _edgeclient;
-    public List<Contact> ContactList { get; set; } = new();
-    public List<Contact> NewContactList { get; set; } = new();
     public IndexModel(EdgeDBClient client)
     {
         _edgeclient = client;
     }
-    public async Task<IActionResult> OnGet()
-    {
-        var result = await _edgeclient.QueryAsync<Contact>("SELECT Contact {first_name,last_name,email,title,birth_date,description,marriage_status};");
-        ContactList=result.ToList();
-        return Page();
-    }
+    [BindProperty]
+    public LoginInput LoginInput { get; set; }
 
-    public async Task<IActionResult> OnGetSearch(string searchValue)
+    public async Task<IActionResult> OnPost()
     {
-        // Response.ContentType = "application/json";
-        var output = await _edgeclient.QueryAsync<Contact>("SELECT Contact {first_name,last_name,email,title,birth_date,description,marriage_status};");
-        ContactList = output.ToList();
-
-        if (string.IsNullOrEmpty(searchValue))
+        string username = LoginInput.UserName;
+        string password = LoginInput.Password;
+        if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
         {
-            var data = new { list = ContactList };
-            return new JsonResult(data);
+            ModelState.AddModelError("", "username and password fields must be entered");
+            return Page();
         }
-        searchValue = searchValue.ToLower();
-        foreach(var contact in ContactList)
+        var query = @"SELECT Contact {username, password, role } FILTER Contact.username = <str>$username";
+        var result = await _edgeclient.QueryAsync<Contact>(query, new Dictionary<string, object?>
         {
-            if(contact.FirstName.ToLower().Contains(searchValue) || contact.LastName.ToLower().Contains(searchValue) || contact.Email.ToLower().Contains(searchValue))
+           { "username", LoginInput.UserName }
+        });
+        if(result.Count > 0)
+        {
+            var passwordHasher = new PasswordHasher<string>();
+            var passwordVerificationResult = passwordHasher.VerifyHashedPassword(null, result.First().Password , LoginInput.Password);
+            if (passwordVerificationResult==PasswordVerificationResult.Success)
             {
-                NewContactList.Add(contact);
+                    var claims = new List<Claim>
+                    {
+                       new Claim(ClaimTypes.Name, result.First().Username),
+                       new Claim(ClaimTypes.Role, result.First().Role),
+                    };
+                    var scheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    var claimsIdentity = new ClaimsIdentity(
+                    claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var authProperties = new AuthenticationProperties
+                    {
+                        AllowRefresh = true,
+                        ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10),
+
+                    };
+                    var user = new ClaimsPrincipal(claimsIdentity);
+                    await HttpContext.SignInAsync(scheme, user, authProperties);
+                    return RedirectToPage("/ContactList");
             }
+            else
+            {
+               ModelState.AddModelError("", "Invalid password");
+               return Page();
+            }
+        
         }
-        var result= new { list = NewContactList };
-        return new JsonResult(result);
+        else
+        {
+           ModelState.AddModelError("", "Unsuccessful login attempt ");
+           return Page();
+            
+        }
+
     }
 
-
-
+    public async Task<IActionResult> OnPostLoggingOut()
+    {
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        return RedirectToPage("/Index");
+    }
+}
+public class LoginInput
+{
+    public string UserName { get; set; }
+    public string Password { get; set; }
+    public List<LoginInput> Inputs { get; set; }
 }

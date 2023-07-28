@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <PackageReference Include="EdgeDB.Net.Driver" Version="1.2.2" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="7.0.9" />
+    <PackageReference Include="Unity" Version="5.11.10" />
   </ItemGroup>
 
 </Project>
