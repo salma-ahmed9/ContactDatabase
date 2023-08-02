@@ -7,7 +7,7 @@ module default {
     required last_name: str; 
     required email: str; 
     required title: str; 
-    required birth_date: str; 
+    required birth_date: datetime; 
     required description: str; 
     required marriage_status: bool; 
  }

@@ -45,7 +45,6 @@ public class ContactListModel : PageModel
 
     public async Task<IActionResult> OnGetDelete(string contactId)
     {
-        Console.WriteLine(contactId);
         Guid newId = new Guid(contactId);
         var output = await _edgeclient.QueryAsync<Contact>("DELETE Contact FILTER .id = <uuid>$id", new Dictionary<string, object?> { { "id", newId } });
         var result = await _edgeclient.QueryAsync<Contact>("SELECT Contact {*} Order by .first_name;");
